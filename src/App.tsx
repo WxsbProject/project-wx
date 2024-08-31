@@ -35,7 +35,7 @@ function App() {
     };
 
     const judgeZengfu = (zf: number): boolean => {
-        return getProbability(zf) > getRandomInt(0, 99);
+        return getProbability(zf) * 1.05 + 1 > getRandomInt(0, 99);
     }
 
     const judgeDrop = (zf: number): number => {
@@ -77,7 +77,7 @@ function App() {
                      ${loading ? (zf < 10 ? 'animate-shake_low' : 'animate-shake_high') : ''}`} alt="wx logo"/>
                 </div>
                 <div className="flex flex-col items-center justify-center space-y-10 p-2">
-                    <div className={`text-center text-pink-300 text-xl`}>当前增幅成功率: {getProbability(zf)}%</div>
+                    <div className={`text-center text-pink-300 text-xl`}>当前增幅成功率: {getProbability(zf) * 1.05 + 1 < 100?getProbability(zf) * 1.05 + 1:100}%</div>
                     <div className={"w-52 h-36 p-5 rounded-l text-center text-red-600 text-4xl m-6 flex-1"}>{state && `增幅${state}`}</div>
                     <button onClick={chong}
                             className={`w-32 h-14  text-center text-xl transition-transform border-dotted rounded-xl ${
