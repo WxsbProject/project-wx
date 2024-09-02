@@ -6,7 +6,7 @@ function App() {
     const [zf, setZf] = useImmer(0)
     const [state, setState] = useImmer('')
     const [loading, setLoading] = useImmer(false);
-    const [_, setCount] = useImmer(0)
+    const [, setCount] = useImmer(0)
     // const [highest, setHighest] = useImmer(0)
 
     const probability: Record<number, number> = {
