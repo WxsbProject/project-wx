@@ -1,3 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.wx-title {
+    @apply p-8 mb-28 text-emerald-500;
+}
