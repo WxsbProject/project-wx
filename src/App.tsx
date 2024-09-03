@@ -3,24 +3,27 @@ import React, {Fragment} from "react";
 import wx from './assets/wx.jpg'
 
 
-function Title({children}: {children: React.ReactNode}) {
+function Title({children}: { children: React.ReactNode }) {
     const width = window.innerWidth;
     return (
-        <h1 className={`wx-title ${width > 1400? 'text-6xl' : 'text-5xl'}`}>{children}</h1>
+        <h1 className={`wx-title ${width > 1400 ? 'text-6xl' : 'text-5xl'}`}>{children}</h1>
     )
 }
 
 interface zfHistory {
-    zf: number;
     succCnt: number;
     failCnt: number;
 }
 
-function History({history}: {history: Array<zfHistory>}) {
+interface historyMap {
+    [zf: number]: zfHistory;
+}
+
+function History({history}: { history: historyMap }) {
     return (
         <div className="flex flex-col">
-            {history.map(history => (
-                <div key={history.zf}>{history.zf} {'>'} {history.zf + 1}: {history.succCnt}/{history.failCnt}</div>
+            {Object.keys(history).map(zf => (
+                <div key={zf}>{zf} {'>'} {zf + 1}: {history[zf].succCnt}/{history[zf].failCnt}</div>
             ))}
         </div>
     )
@@ -31,7 +34,7 @@ function App() {
     const [state, setState] = useImmer('')
     const [loading, setLoading] = useImmer(false);
     const [, setCount] = useImmer(0)
-    const [history, setHistory] = useImmer([])
+    const [history, setHistory] = useImmer({})
     // const [highest, setHighest] = useImmer(0)
 
     const probability: Record<number, number> = {
@@ -95,7 +98,7 @@ function App() {
             <div className="w-screen h-screen bg-gray-900 top-0">
                 <Title>吴翔翔的神秘增幅器</Title>
                 <div className="flex items-center justify-center space-x-20 p-2">
-                    <History history={history} />
+                    <History history={history}/>
                     <div className="flex items-center justify-center space-x-20 p-2">
                         <b className={`text-4xl flex-none
                 ${zf < 3 ? 'text-white' : zf < 5 ? 'text-yellow-100' : zf < 9 ? 'text-yellow-200' : zf < 13 ? 'text-blue-400' : zf < 15 ? 'text-pink-300' : 'text-yellow-500'}`}>+{zf}吴翔翔</b>
@@ -122,7 +125,7 @@ function App() {
                 </div>
             </div>
         </Fragment>
-)
+    )
 }
 
 export default App
