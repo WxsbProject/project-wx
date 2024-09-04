@@ -1,6 +1,7 @@
 import {useImmer} from 'use-immer'
 import React, {Fragment} from "react";
 import wx from './assets/wx.jpg'
+import History, {historyMap} from "./history_list.tsx";
 
 
 function Title({children}: { children: React.ReactNode }) {
@@ -10,42 +11,16 @@ function Title({children}: { children: React.ReactNode }) {
     )
 }
 
-interface zfHistory {
-    succCnt: number;
-    failCnt: number;
+const buffs: Record<string, (i: number) => number> = {
+    'none': (i: number) => i,
+    'dnf-standard': (i: number) => i * 1.05 + 1,
+    'wxx-buff': (i: number) => i * 1.2 + 1,
+    'fuck': (i: number) => i * 1.5 + 5,
 }
 
-const initHistory = {
-    succCnt: 0,
-    failCnt: 0,
-}
-
-interface historyMap {
-    [zf: string]: zfHistory;
-}
-
-function History({history}: { history: historyMap }) {
-    if (Object.entries(history).length > 0) {
-        return (
-            <div
-                className="history_list">
-                {Object.entries(history).map(([zf, h]) => {
-                    const next = Number(zf) + 1;
-                    return (<div className={`border border-emerald-300 py-2.5 px-6`} key={zf}>
-                        <span className={'text-sky-400'}>{`[${zf} ➡️ ${next}]: `}</span>
-                        <span className={'text-green-400'}>{`${h.succCnt}`}</span>
-                        <span className={'text-sky-400'}> / </span>
-                        <span className={'text-red-500'}>{`${h.failCnt}`}</span>
-                    </div>)
-                })}
-            </div>
-        )
-    } else {
-        return (<div className={`history_list text-blue-300 py-2.5 px-6`}>
-            <div>没有数据</div>
-            <div>点击右侧开始增幅你的wxx！</div>
-        </div>)
-    }
+interface buffStruct {
+    name: string,
+    func: (i: number) => number,
 }
 
 function App() {
@@ -53,6 +28,7 @@ function App() {
     const [state, setState] = useImmer<string>('')
     const [loading, setLoading] = useImmer<boolean>(false);
     const [history, setHistory] = useImmer<historyMap>({})
+    const [buff, setBuff] = useImmer<buffStruct>({name: 'none', func: buffs['none']})
 
     const probability: Record<number, number> = {
         0: 100,
@@ -80,7 +56,7 @@ function App() {
     };
 
     const judgeZengfu = (zf: number): boolean => {
-        return getProbability(zf) * 1.05 + 1 > getRandomInt(0, 99);
+        return buff.func(getProbability(zf)) > getRandomInt(0, 99);
     }
 
     const judgeDrop = (zf: number): number => {
@@ -100,7 +76,7 @@ function App() {
 
         setHistory(draft => {
             if (!draft[zf]) {
-                draft[zf] = {...initHistory};
+                draft[zf] = {succCnt: 0, failCnt: 0,};
             }
         });
 
@@ -121,11 +97,25 @@ function App() {
         setLoading(false);
     }
 
+    const handleBuffChange = (name: string) => {
+        const confirm = window.confirm('切换buff会重置增幅数据!')
+        if (confirm) {
+            setBuff(draft => {
+                const b = buffs[name];
+                draft.name = name;
+                draft.func = b;
+            })
+            setState('')
+            setHistory({})
+            setZf(0)
+        }
+    }
+
     return (
         <Fragment>
             <div className="w-screen h-screen bg-gray-900">
                 <Title>吴翔翔的神秘增幅器</Title>
-                <div className="flex items-start justify-center pr-16 h-screen">
+                <div className="flex items-start justify-center h-screen">
                     <History history={history}/>
                     <div className={`flex flex-col flex-auto items-center justify-center`}>
                         <div className="flex flex-auto items-center justify-center space-x-10 p-2">
@@ -137,10 +127,10 @@ function App() {
                         </div>
                         <div className="flex flex-col items-center left-0 space-y-6 p-2">
                             <div
-                                className={`text-center text-pink-300 text-xl`}>当前增幅成功率: {getProbability(zf) * 1.05 + 1 < 100 ? getProbability(zf) * 1.05 + 1 : 100}%
+                                className={`text-center text-pink-300 text-xl`}>当前增幅成功率: {buff.func(getProbability(zf)) < 100 ? buff.func(getProbability(zf)) : 100}%
                             </div>
                             <div
-                                className={"min-w-52 h-36 p-8 rounded-l text-center text-red-600 text-4xl flex-1"}>{state && `增幅${state}`}</div>
+                                className={`${!state && 'invisible'} p-1 text-center text-red-600 text-4xl`}>{`增幅${state}`}</div>
                             <button onClick={chong}
                                     className={`w-32 h-14  text-center text-xl transition-transform border-dotted rounded-xl ${
                                         loading
@@ -151,6 +141,41 @@ function App() {
                                 {loading ? '增幅中...' : '增幅'}
                             </button>
                         </div>
+                    </div>
+                    <div className={`buff_list`}>
+                        <h3 className={`text-xl`}>请选择一个Buff:</h3>
+                        <label className={`buff_label`}>
+                            <input
+                                type="radio"
+                                checked={buff.name === 'none'}
+                                onChange={() => handleBuffChange('none')}
+                            />
+                            我是高手，不需要
+                        </label>
+                        <label className={`buff_label`}>
+                            <input
+                                type="radio"
+                                checked={buff.name === 'dnf-standard'}
+                                onChange={() => handleBuffChange('dnf-standard')}
+                            />
+                            普雷+增幅药
+                        </label>
+                        <label className={`buff_label`}>
+                            <input
+                                type="radio"
+                                checked={buff.name === 'wxx-buff'}
+                                onChange={() => handleBuffChange('wxx-buff')}
+                            />
+                            wxx的馈赠
+                        </label>
+                        <label className={`buff_label`}>
+                            <input
+                                type="radio"
+                                checked={buff.name === 'fuck'}
+                                onChange={() => handleBuffChange('fuck')}
+                            />
+                            我急了
+                        </label>
                     </div>
                 </div>
             </div>

@@ -7,5 +7,13 @@
 }
 
 .history_list {
-    @apply flex flex-col flex-auto text-center text-xl border-2 ml-8 border-emerald-300 rounded max-w-48
+    @apply flex flex-col flex-auto text-center text-xl border-2 ml-8 border-emerald-300 rounded max-w-56
+}
+
+.buff_list {
+    @apply flex flex-col flex-auto border-2 mr-8 border-emerald-300 rounded max-w-56 text-amber-400
+}
+
+.buff_label {
+    @apply p-2 border border-emerald-300
 }
