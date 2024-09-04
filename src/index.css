@@ -5,3 +5,7 @@
 .wx-title {
     @apply p-8 mb-14 text-emerald-500 w-full;
 }
+
+.history_list {
+    @apply flex flex-col flex-auto text-center text-xl border-2 ml-8 border-emerald-300 rounded max-w-48
+}

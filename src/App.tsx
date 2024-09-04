@@ -28,17 +28,23 @@ function History({history}: { history: historyMap }) {
     if (Object.entries(history).length > 0) {
         return (
             <div
-                className="flex flex-col text-left text-xl text-sky-400 border-2 ml-8 border-emerald-300 rounded min-w-20">
-                {Object.entries(history).map(([zf, h]: [string, zfHistory]) => {
+                className="history_list">
+                {Object.entries(history).map(([zf, h]) => {
                     const next = Number(zf) + 1;
-                    return (<div className={`border border-emerald-300 py-2.5 px-6`}
-                                 key={zf}>{`【${zf} ➡️ ${next}】: ${h.succCnt} / ${h.failCnt}`}</div>)
+                    return (<div className={`border border-emerald-300 py-2.5 px-6`} key={zf}>
+                        <span className={'text-sky-400'}>{`[${zf} ➡️ ${next}]: `}</span>
+                        <span className={'text-green-400'}>{`${h.succCnt}`}</span>
+                        <span className={'text-sky-400'}> / </span>
+                        <span className={'text-red-500'}>{`${h.failCnt}`}</span>
+                    </div>)
                 })}
             </div>
         )
     } else {
-        return (<div
-            className={`flex flex-col text-left text-xl text-sky-400 border-2 ml-8 border-emerald-300 rounded p-6`}>没有数据</div>)
+        return (<div className={`history_list text-blue-300 py-2.5 px-6`}>
+            <div>没有数据</div>
+            <div>点击右侧开始增幅你的wxx！</div>
+        </div>)
     }
 }
 
@@ -119,7 +125,7 @@ function App() {
         <Fragment>
             <div className="w-screen h-screen bg-gray-900">
                 <Title>吴翔翔的神秘增幅器</Title>
-                <div className="flex items-center pr-16">
+                <div className="flex items-start justify-center pr-16 h-screen">
                     <History history={history}/>
                     <div className={`flex flex-col flex-auto items-center justify-center`}>
                         <div className="flex flex-auto items-center justify-center space-x-10 p-2">
